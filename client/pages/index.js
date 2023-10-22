@@ -1,5 +1,3 @@
-const Landing = () => {
-  return <h1>Landing Page</h1>;
+export default () => {
+  return <h1>Landinddg Page</h1>;
 };
- 
-export default Landing;
