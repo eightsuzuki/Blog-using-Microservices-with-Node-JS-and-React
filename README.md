@@ -14,5 +14,14 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 /auth
 npm run test
 
-docker push eightsuzuki/client
-docker push eightsuzuki/auth
+Step to do only if you are running Docker/Kubernetes on your local machine (if you are using Google Cloud then skip this)
+
+Change into the client directory at your terminal
+
+Run docker build -t YOURDOCKERID/client .
+
+Run docker push YOURDOCKERID/client
+
+Change back to the root project directory.
+
+Run skaffold dev
