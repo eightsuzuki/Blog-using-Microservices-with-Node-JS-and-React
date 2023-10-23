@@ -25,3 +25,5 @@ Run docker push YOURDOCKERID/client
 Change back to the root project directory.
 
 Run skaffold dev
+
+https://github.com/eightsuzuki/Common-Module-Blog-using-Microservices-with-Node-JS-and-React-Public
