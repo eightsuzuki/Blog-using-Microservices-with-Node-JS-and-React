@@ -4,7 +4,11 @@ import request from 'supertest';
 import { app } from '../app';
 
 declare global {
-  var signin: () => Promise<string[]>;
+  namespace NodeJS {
+    interface Global {
+      signin(): Promise<string[]>;
+    }
+  }
 }
 
 let mongo: any;
@@ -12,10 +16,13 @@ beforeAll(async () => {
   process.env.JWT_KEY = 'asdfasdf';
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-  const mongo = await MongoMemoryServer.create();
-  const mongoUri = mongo.getUri();
+  mongo = new MongoMemoryServer();
+  const mongoUri = await mongo.getUri();
 
-  await mongoose.connect(mongoUri, {});
+  await mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 });
 
 beforeEach(async () => {
@@ -27,25 +34,15 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  if (mongo) {
-    await mongo.stop();
-  }
+  await mongo.stop();
   await mongoose.connection.close();
 });
 
 global.signin = async () => {
-  const email = 'test@test.com';
-  const password = 'password';
-
-  const response = await request(app)
-    .post('/api/users/signup')
-    .send({
-      email,
-      password,
-    })
-    .expect(201);
-
-  const cookie = response.get('Set-Cookie');
-
-  return cookie;
+  // Build a JWT payload.  { id, email }
+  // Create the JWT!
+  // Build session Object. { jwt: MY_JWT }
+  // Turn that session into JSON
+  // Take JSON and encode it as base64
+  // return a string thats the cookie with the encoded data
 };

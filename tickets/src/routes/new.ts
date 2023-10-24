@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { requireAuth } from '@rallycoding/common';
+import { requireAuth } from '@cygnetops/common';
 
 const router = express.Router();
 
