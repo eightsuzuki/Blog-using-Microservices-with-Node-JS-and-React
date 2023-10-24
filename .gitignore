@@ -4,3 +4,4 @@ client/node_modules
 common/node_modules
 common/.git
 common/.gitignore
+tickets/node_modules
