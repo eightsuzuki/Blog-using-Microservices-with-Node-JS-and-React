@@ -26,4 +26,6 @@ Change back to the root project directory.
 
 Run skaffold dev
 
+type "thisisunsafe" on chrome
+
 https://github.com/eightsuzuki/Common-Module-Blog-using-Microservices-with-Node-JS-and-React-Public
