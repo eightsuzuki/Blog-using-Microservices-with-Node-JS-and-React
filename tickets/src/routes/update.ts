@@ -5,7 +5,7 @@ import {
   NotFoundError,
   requireAuth,
   NotAuthorizedError,
-} from '@suzuki8-tickets/common';
+} from '@rallycoding/common';
 import { Ticket } from '../models/ticket';
 
 const router = express.Router();
