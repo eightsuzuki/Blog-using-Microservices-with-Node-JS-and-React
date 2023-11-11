@@ -3,7 +3,7 @@ import {
   requireAuth,
   NotFoundError,
   NotAuthorizedError,
-} from '@suzuki8-tickets/common';
+} from '@rallycoding/common';
 import { Order } from '../models/order';
 
 const router = express.Router();
