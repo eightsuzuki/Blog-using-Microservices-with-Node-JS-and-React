@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
-import { requireAuth, validateRequest } from '@suzuki8-tickets/common';
+import { requireAuth, validateRequest } from '@rallycoding/common';
 import { Ticket } from '../models/ticket';
 import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 import { natsWrapper } from '../nats-wrapper';
