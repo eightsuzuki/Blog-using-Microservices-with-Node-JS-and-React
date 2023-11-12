@@ -7,3 +7,4 @@ common/.git
 common/.gitignore
 tickets/node_modules
 expires/node_modules
+payments/node_modules
