@@ -7,7 +7,7 @@ import {
   NotAuthorizedError,
   NotFoundError,
   OrderStatus,
-} from '@suzuki8-tickets/common';
+} from '@rallycoding/common';
 import { stripe } from '../stripe';
 import { Order } from '../models/order';
 

@@ -3,7 +3,7 @@ import {
   Subjects,
   Listener,
   OrderStatus,
-} from '@suzuki8-tickets/common';
+} from '@rallycoding/common';
 import { Message } from 'node-nats-streaming';
 import { queueGroupName } from './queue-group-name';
 import { Order } from '../../models/order';
