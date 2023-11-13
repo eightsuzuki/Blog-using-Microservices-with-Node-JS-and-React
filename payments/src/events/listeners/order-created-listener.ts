@@ -1,5 +1,5 @@
 import { Message } from 'node-nats-streaming';
-import { Listener, OrderCreatedEvent, Subjects } from '@suzuki8-tickets/common';
+import { Listener, OrderCreatedEvent, Subjects } from '@rallycoding/common';
 import { queueGroupName } from './queue-group-name';
 import { Order } from '../../models/order';
 
