@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { updateIfCurrentPlugin } from 'mongoose-update-if-current';
-import { OrderStatus } from '@rallycoding/common';
+import { OrderStatus } from '@suzuki8-tickets/common';
 
 interface OrderAttrs {
   id: string;
