@@ -1,45 +1,25 @@
 # Blog Application Overview
+## Ticketing E-commerce Application
 
-## Description
-This blog web application was developed for learning purposes and incorporates several key features, including post creation/editing/deletion, commenting on posts, and comment moderation.
+### Description
+This ticketing e-commerce application has been developed for educational purposes, showcasing various functionalities related to ticket management and sales. The main features include:
 
-![App Demonstration](./images/Description/app-demonstration.png)
+- Creating, editing, and deleting tickets
+- Ordering tickets
+- Purchasing tickets
 
-## Application Architecture
+![Application Screenshot](./images/appView.png)
 
-The blog app follows a microservices architecture, comprising six independent services: Client, Posts, Comments, Moderation, Query, and Event Bus. Deployed within a Kubernetes cluster, an ingress controller handles traffic distribution to each service. The microservices communicate through events emitted during specific actions, creating a seamless and modular architecture.
+### App Overview
+The ticketing application follows a microservices architecture, comprising six independent services: Auth, Client, Tickets, Orders, Payments, and Expiration. These services operate concurrently and are deployed within a Kubernetes cluster. Load balancing of external traffic to each service is managed by an ingress controller.
 
-![App Overview](./images/App-Overview/blog-app-overview.jpg)
+Due to the microservices design, direct communication between services is avoided. Instead, events are generated whenever a service executes a task. These events are then transmitted to the NATS-Streaming Server, serving as the Event Bus. Subsequently, the Pub-Sub model is employed to relay these events to the relevant services.
 
-### Client Service
-The Client service provides the React app, facilitating user interactions with other services. For instance, when a user submits a post, the Client service initiates an HTTP POST request to the Posts service.
+![Microservices Architecture](./images/appArchitecture.png)
 
-### Posts Service
-Responsible for post management, the Posts service handles creation, editing, and deletion. It maintains a MongoDB database for storing posts and emits events (e.g., PostCreated) upon these actions. The Event Bus relays these events to the Query Service for centralized handling.
+This architecture promotes scalability, maintainability, and independence of each service. The use of an Event Bus enhances decoupling between services, enabling efficient communication in a distributed environment.
 
-![Posts Service Overview](./images/App-Overview/posts-service-overview.jpg)
-
-### Comments Service
-The Comments service oversees comment creation and moderation. Comments are stored in a MongoDB database, and the service emits a CommentCreated event upon insertion. After moderation by the Moderation service, the Comments service updates the Query service to reflect the comment's status.
-
-![Comments Service Overview](./images/App-Overview/comments-service-overview.jpg)
-
-### Moderation Service
-The Moderation service moderates comments by checking for predefined "NG words." If found, the comment is marked as 'rejected.' The React app filters out comments with a 'rejected' status.
-
-![Moderation Service Overview](./images/App-Overview/moderation-service-overview.jpg)
-
-### Query Service
-The Query service consolidates posts and comments, maintaining its database for efficient data retrieval. This service eliminates the need for individual requests to the Posts and Comments services, ensuring optimal performance. Even during downtime, the Query service ensures uninterrupted access to posts and comments.
-
-![Query Service Overview](./images/App-Overview/query-service-overview.jpg)
-
-### Event Bus Service
-The Event Bus service acts as a mediator, facilitating event communication among services. Employing a Pub/Sub model, events are published onto a shared bus and delivered to respective subscribers. Notably, the Event Bus supports event replay, ensuring seamless event delivery even after service downtime.
-
-![Event Bus Service Overview](./images/App-Overview/event-bus-service-overview.jpg)
-
-This microservices-based architecture enhances scalability, maintainability, and overall system flexibility.
+This ticketing e-commerce application serves as a practical example of microservices implementation, providing insights into the orchestration and communication strategies within a complex system.
 
 
 # Prerequisites
@@ -51,6 +31,7 @@ This microservices-based architecture enhances scalability, maintainability, and
 cd auth
 npm install
 sed -i 's|image: .*|image: {your_docker_id}/auth|' k8s/deployment.yaml
+cd ..
 skaffold dev
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
 npm run test
@@ -80,7 +61,7 @@ kubectl port-forward $NATS_POD 8222:8222 &
 ```
 ## Run NATS Server commands
 ```
-cd nets-test
+cd nats-test
 npm run publish
 npm run listen
 npm run listen

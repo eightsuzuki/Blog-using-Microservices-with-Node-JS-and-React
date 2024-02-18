@@ -8,3 +8,6 @@ common/.gitignore
 tickets/node_modules
 expires/node_modules
 payments/node_modules
+README.md copy
+images/App-Overview
+images/Description
