@@ -1,68 +1,188 @@
-# Blog Application Overview
-## Ticketing E-commerce Application
+# チケティングアプリケーション
+## 概要
+これは学習目的で開発したシンプルなチケティングEコマースアプリケーションです。以下の機能をサポートしています。
+- チケットの作成、編集、削除
+- チケットの注文
+- チケットの購入
+<p align="center">
+  <img width="793" alt="image" src="./images/appView.png">
+</p>
 
-### Description
-This ticketing e-commerce application has been developed for educational purposes, showcasing various functionalities related to ticket management and sales. The main features include:
+## アプリケーション概要
+このチケットアプリは、バックグラウンドで実行される6つの小規模な独立したサービスから構成されるマイクロサービスアプリケーションです。
+Auth、Client、Tickets、Orders、Payments、Expirationの6つのサービスがあります。
+これらはKubernetesクラスタにデプロイされ、外部から各サービスへのトラフィックのロードバランシングはIngressコントローラによって処理されます。
+アプリはマイクロサービスアーキテクチャに従っているため、これらのサービスは直接通信しません。
+代わりに、各サービスがタスクを実行するたびに発行されるイベントはNATS Streaming Serverに送信され、それをEvent Busとして使用してPub-Subモデルを使用して適切なサービスに送信されます。
+<p align="center">
+  <img width="730" alt="image" src="./images/appArchitecture.png">
+</p>
 
-- Creating, editing, and deleting tickets
-- Ordering tickets
-- Purchasing tickets
+## クライアントサービス
 
-![Application Screenshot](./images/appView.png)
+### 概要
+クライアントサービスはReactアプリを提供し、ユーザーアクションに基づいて他のサービスと通信します。
+たとえば、ユーザーがチケットの作成にタイトルと価格を入力して「送信」ボタンをクリックすると、HTTP POSTリクエストがチケットサービスに送信されます。
 
-### App Overview
-The ticketing application follows a microservices architecture, comprising six independent services: Auth, Client, Tickets, Orders, Payments, and Expiration. These services operate concurrently and are deployed within a Kubernetes cluster. Load balancing of external traffic to each service is managed by an ingress controller.
+## 認証サービス
+### 概要
+認証サービスはユーザー認証に関連する機能を提供します。
+主な機能は、サインアップ（ユーザー登録）、サインイン、サインアウト、および現在のユーザー情報の取得です。
+サインアップ時には、ユーザー情報がデータベースに登録され、セッション管理のためにサーバーサイドでJWTが生成されます。
+また、JWTを使用して認証されたユーザー情報をリクエストオブジェクトに追加するミドルウェアもあり、ユーザーが一度ログインすれば再びサインインする必要はありません。
 
-Due to the microservices design, direct communication between services is avoided. Instead, events are generated whenever a service executes a task. These events are then transmitted to the NATS-Streaming Server, serving as the Event Bus. Subsequently, the Pub-Sub model is employed to relay these events to the relevant services.
+### ルート
+<p align="center">
+  <img width="597" alt="image" src="./images/root/rootAuth.png">
+</p>
 
-![Microservices Architecture](./images/appArchitecture.png)
+### データモデル
+<p align="center">
+  <img width="267" alt="image" src="./images/data/dataAuth.png">
+</p>
 
-This architecture promotes scalability, maintainability, and independence of each service. The use of an Event Bus enhances decoupling between services, enabling efficient communication in a distributed environment.
+## チケットサービス
 
-This ticketing e-commerce application serves as a practical example of microservices implementation, providing insights into the orchestration and communication strategies within a complex system.
+### 概要
+チケットサービスは、チケットの作成、取得、更新の機能を提供し、NATS Streamingサーバーを介してイベントを発行します。
+また、作成または更新されたすべてのチケットを保存するために独自のMongoDBデータベースを維持しています。
+
+### ルート
+<p align="center">
+  <img width="577" alt="image" src="./images/root/rootTicket.png">
+</p>
+
+### データモデル
+<p align="center">
+  <img width="267" alt="image" src="./images/data/dataTicket.png">
+</p>
+
+### イベント
+このサービスのイベントには次のタイプがあり、以下の図に示すように他のサービスに発行されます。
+### ticket:created
+<p align="center">
+  <img width="835" alt="image" src="./images/event/eventTicketCreated.png">
+</p>
+
+### ticket:updated
+<p align="center">
+  <img width="832" alt="image" src="./images/event/eventTicketUpdated.png">
+</p>
+
+## 注文サービス
+
+### 概要
+注文サービスは、チケットのための注文の作成、取得、削除の機能を提供し、NATS Streamingサーバーを介してイベントを発行します。
+また、作成または更新されたすべてのチケットを保存するために独自のMongoDBデータベースを維持しています。
+
+### ルート
+<p align="center">
+  <img width="594" alt="image" src="./images/root/rootPayments.png">
+</p>
+
+### データモデル
+<p align="center">
+  <img width="427" alt="image" src="./images/data/dataPayments.png">
+</p>
+
+### イベント
+このサービスのイベントには次のタイプがあり、以下の図に示すように他のサービスに発行されます。
+### order:created
+<p align="center">
+  <img width="917" alt="image" src="./images/event/eventOrderCreated.png">
+</p>
+
+### order:cancelled
+<p align="center">
+  <img width="914" alt="image" src="./images/event/eventOrderCancelled.png">
+</p>
+
+## 支払いサービス
+
+### 概要
+支払いサービスは、ユーザーが注文に対して支払いを行う機能を提供し、Stripeを使用して支払いを処理し、
+データベースに支払い情報を記録し、NATS Streamingサーバーを介してイベントを発行します。
+
+### ルート
+<p align="center">
+  <img width="672" alt="image" src="./images/root/rootPayments.png">
+</p>
 
 
-# Prerequisites
- Make sure you have Node.js, Docker, Skaffold, kubectl, and Ingress-Nginx installed. 
- Make sure you have Node.js, Docker, Skaffold, kubectl, and Ingress-Nginx installed. 
+### データモデル
+<p align="center">
+  <img width="427" alt="image" src="./images/data/dataPayments.png">
+</p>
 
-## Setting up Authentication Microservice
-```
-cd auth
-npm install
-sed -i 's|image: .*|image: {your_docker_id}/auth|' k8s/deployment.yaml
-cd ..
-skaffold dev
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
-npm run test
-```
+### イベント
+このサービスのイベントには次のタイプがあり、以下の図に示すように他のサービスに発行されます。
+### payment:created
+<p align="center">
+  <img width="832" alt="image" src="./images/event/eventPaymentCreated.png">
+</p>
 
-## If running locally
-```
-docker build -t YOURDOCKERID/auth .
-docker push YOURDOCKERID/auth
-```
-## Setting up Client Microservice
-```
-cd client
-docker build -t YOURDOCKERID/client .
-docker push YOURDOCKERID/client
-cd ..
-skaffold dev
-```
-## Setting up Other Microservices
-Repeat above steps for other microservices like /tickets and /nets-test.
+## 有効期限サービス
 
-## Running NATS Server
-```
-NATS_POD=$(kubectl get pods -l app=nats-depl -o jsonpath='{.items[0].metadata.name}')
-kubectl port-forward $NATS_POD 4222:4222 &
-kubectl port-forward $NATS_POD 8222:8222 &
-```
-## Run NATS Server commands
-```
-cd nats-test
-npm run publish
-npm run listen
-npm run listen
-```
+### 概要
+有効期限サービスは、注文が作成されたときの注文の有効期限を管理し、有効期限が切れると注文ステータスの更新を行うジョブをキューにスケジュールします。
+
+### イベント
+このサービスのイベントには次のタイプがあり、以下の図に示すように他のサービスに発行されます。
+### expiration:complete
+<p align="center">
+  <img width="835" alt="image" src="./images/event/eventExpirationComplete.png">
+</p>
+
+## マイクロサービスのセットアップ手順
+まず、必要なものはNode.js、Docker、Skaffold、kubectl、そしてIngress-Nginxがインストールされていることを確認してください。
+
+### 認証マイクロサービスのセットアップ
+   ```bash
+   cd auth
+   npm install
+   sed -i 's|image: .*|image: {your_docker_id}/auth|' k8s/deployment.yaml
+   cd ..
+   skaffold dev
+   kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
+   npm run test
+   ```
+
+### ローカルで実行する場合
+   ```bash
+   docker build -t YOURDOCKERID/auth .
+   docker push YOURDOCKERID/auth
+   ```
+
+次に、クライアントマイクロサービスのセットアップ手順です。
+
+### クライアントマイクロサービスのセットアップ
+   ```bash
+   cd client
+   docker build -t YOURDOCKERID/client .
+   docker push YOURDOCKERID/client
+   cd ..
+   skaffold dev
+   ```
+
+その他のマイクロサービス（例：/ticketsや/nets-test）についても、上記の手順を繰り返してセットアップします。
+
+NATSサーバーを実行する手順は次の通りです。
+
+### NATSサーバーの実行
+   ```bash
+   NATS_POD=$(kubectl get pods -l app=nats-depl -o jsonpath='{.items[0].metadata.name}')
+   kubectl port-forward $NATS_POD 4222:4222 &
+   kubectl port-forward $NATS_POD 8222:8222 &
+   ```
+
+NATSサーバーコマンドを実行する手順は次の通りです。
+
+### NATSサーバーコマンドの実行
+   ```bash
+   cd nats-test
+   npm run publish
+   npm run listen
+   npm run listen
+   ```
+
+これで、認証マイクロサービス、クライアントマイクロサービス、およびその他のマイクロサービスがセットアップされ、NATSサーバーが実行されている状態になります。
